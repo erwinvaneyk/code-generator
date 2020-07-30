@@ -678,9 +678,13 @@ func membersToFields(locator ProtobufLocator, t *types.Type, localPackage types.
 		if (field.Type.Name.Name == "bytes" && field.Type.Name.Package == "") || (field.Repeated && field.Type.Name.Package == "" && namer.IsPrivateGoName(field.Type.Name.Name)) {
 			delete(field.Extras, "(gogoproto.nullable)")
 		}
-		if field.Name != m.Name {
+		if !m.Embedded && field.Name != m.Name {
 			field.Extras["(gogoproto.customname)"] = strconv.Quote(m.Name)
 		}
+		if m.Embedded {
+			field.Extras["(gogoproto.embed)"] = "true"
+		}
+
 		field.CommentLines = m.CommentLines
 		fields = append(fields, field)
 	}

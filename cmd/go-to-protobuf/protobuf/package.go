@@ -153,6 +153,12 @@ func (p *protobufPackage) ExtractGeneratedType(t *ast.TypeSpec) bool {
 			if len(f.Tag.Value) == 0 {
 				continue
 			}
+
+			// If the field is embedded
+			if f.Names == nil {
+				continue
+			}
+
 			tag := strings.Trim(f.Tag.Value, "`")
 			protobufTag := reflect.StructTag(tag).Get("protobuf")
 			if len(protobufTag) == 0 {
@@ -170,7 +176,9 @@ func (p *protobufPackage) ExtractGeneratedType(t *ast.TypeSpec) bool {
 				m = make(map[string]string)
 				p.StructTags[t.Name.Name] = m
 			}
-			m[f.Names[0].Name] = tag
+			if f.Names != nil {
+				m[f.Names[0].Name] = tag
+			}
 		}
 	default:
 		log.Printf("WARNING: unexpected Go AST type definition: %#v", t)
